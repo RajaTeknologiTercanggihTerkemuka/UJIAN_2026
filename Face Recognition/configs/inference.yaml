@@ -1,0 +1,12 @@
+architecture: InceptionResnetV1
+weights: Face Recognition/artifacts/exported_models/imsfd_partial_ft_v1/inceptionresnetv1_imsfd_partial_finetuned.pth
+input_size: 160
+embedding_dim: 512
+training_preprocessing_version: squarepad_resize160_fixedstd_v1
+inference_preprocessing_version: mtcnn160_margin20_fixedstd_v1
+similarity: cosine
+threshold_source: validation_capture_pairs
+notes:
+  - Threshold must be calibrated using MTCNN inference output from a representative validation capture set.
+  - Never use test set to tune threshold.
+  - Registration and verification templates must be made using the same model and inference preprocessing versions.

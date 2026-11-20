@@ -1,0 +1,46 @@
+# Metric taxonomy. Do not log raw images, names, NIMs, or embeddings as ordinary logs.
+training:
+  - train_loss
+  - validation_loss
+  - train_identity_top1
+  - validation_identity_top1
+  - learning_rate_backbone
+  - learning_rate_arcface
+verification_offline:
+  - accuracy
+  - precision
+  - recall
+  - f1_score
+  - far
+  - frr
+  - roc_auc
+  - eer
+  - threshold_selected_on_validation
+runtime:
+  - request_count
+  - request_error_rate
+  - detection_latency_ms
+  - embedding_latency_ms
+  - comparison_latency_ms
+  - total_latency_ms
+  - no_face_rate
+  - multi_face_rate
+  - low_detection_confidence_rate
+  - quality_warning_rate
+  - anti_spoof_latency_ms
+  - anti_spoof_unknown_rate
+  - anti_spoof_review_rate
+  - pad_live_score_distribution
+pad_offline_evaluation:
+  - apcer
+  - bpcer
+  - acer
+  - pad_roc_auc
+  - pad_validation_threshold
+version_tags:
+  - model_version
+  - preprocessing_version
+  - threshold_version
+  - dataset_version
+  - git_commit
+  - app_version

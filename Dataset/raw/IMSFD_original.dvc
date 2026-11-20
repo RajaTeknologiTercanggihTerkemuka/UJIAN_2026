@@ -1,0 +1,6 @@
+outs:
+- md5: 082f065b4c9466b69261a3c3b4a97d9c.dir
+  size: 6716100656
+  nfiles: 26761
+  hash: md5
+  path: IMSFD_original

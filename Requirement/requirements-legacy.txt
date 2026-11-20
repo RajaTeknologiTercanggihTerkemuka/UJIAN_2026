@@ -1,0 +1,17 @@
+# Daftar requirements.txt lama dari workspace TA v2.0, disimpan sebagai arsip.
+# Tidak disarankan memasang semua paket ini sekaligus.
+# Lihat README.md dan file requirements terpisah untuk memilih environment.
+opencv-python
+matplotlib
+scikit-learn
+IPython
+torch
+torchvision
+numpy
+Pillow
+scipy
+einops
+fastapi
+uvicorn
+jinja2
+python-multipart

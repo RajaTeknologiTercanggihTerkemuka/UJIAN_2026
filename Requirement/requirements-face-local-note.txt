@@ -1,0 +1,3 @@
+# Do not install yet.
+# Pin the local PyTorch/facenet-pytorch environment separately after model loader validation.
+# Keep GPU training in Google Colab for now.

@@ -1,0 +1,6 @@
+outs:
+- md5: d1fd05b98b3d97701e7c0f673f128aaf.dir
+  size: 626469609
+  nfiles: 12961
+  hash: md5
+  path: UTBK_reference_images

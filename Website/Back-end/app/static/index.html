@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TA v2 — Registrasi & Verifikasi Wajah</title>
+<style>
+body{font-family:system-ui,Arial;background:#f4f6fa;color:#172033;margin:0}.wrap{max-width:850px;margin:28px auto;padding:20px}.card{background:white;border-radius:16px;padding:22px;margin-bottom:16px;box-shadow:0 5px 20px #17203312}h1{margin-top:0}label{display:block;margin:10px 0 5px;font-weight:600}input,button,select{padding:11px;border:1px solid #cbd5e1;border-radius:9px;font:inherit}input{width:100%;box-sizing:border-box}button{cursor:pointer;background:#1d4ed8;color:white;border:0;margin:8px 6px 0 0}button.secondary{background:#475569}video{width:100%;max-height:440px;background:#0f172a;border-radius:12px}pre{white-space:pre-wrap;background:#f1f5f9;padding:14px;border-radius:10px}.note{color:#64748b;font-size:.9rem}.status{font-weight:700}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:650px){.row{grid-template-columns:1fr}}</style>
+</head>
+<body><div class="wrap">
+<div class="card"><h1>Registrasi & Verifikasi Wajah</h1><p class="note">Prototype penelitian lokal. Kamera hanya diakses setelah Anda memberi izin. Jangan gunakan untuk keputusan ujian nyata sebelum validasi, autentikasi, anti-spoofing, dan pengamanan sistem lengkap.</p>
+<div class="row"><div><label>NIM</label><input id="nim" autocomplete="off" placeholder="Masukkan NIM"></div><div><label>Mode</label><select id="mode"><option value="verify">Verifikasi 1:1</option><option value="enroll">Registrasi referensi (admin)</option></select></div></div>
+<div id="nameWrap" style="display:none"><label>Nama lengkap (untuk enrollment admin)</label><input id="fullName" placeholder="Nama peserta"></div>
+<label>Kamera</label><select id="cameraMode"><option value="user">Kamera depan</option><option value="environment">Kamera belakang</option></select>
+<video id="video" autoplay playsinline muted></video><canvas id="canvas" hidden></canvas>
+<button id="startBtn">Aktifkan kamera</button><button id="captureBtn" class="secondary" disabled>Ambil & Proses Wajah</button>
+<p class="note" id="cameraStatus">Kamera belum aktif.</p>
+</div>
+<div class="card"><h2>Hasil</h2><div id="result" class="status">Belum ada permintaan.</div><pre id="details">-</pre></div>
+<div class="card"><a href="/admin">Dashboard operator →</a></div>
+</div>
+<script>
+const video=document.getElementById('video'), canvas=document.getElementById('canvas');let stream=null;
+const mode=document.getElementById('mode');mode.addEventListener('change',()=>document.getElementById('nameWrap').style.display=mode.value==='enroll'?'block':'none');
+document.getElementById('startBtn').onclick=async()=>{try{if(stream)stream.getTracks().forEach(t=>t.stop());stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:document.getElementById('cameraMode').value,width:{ideal:1280},height:{ideal:720}},audio:false});video.srcObject=stream;document.getElementById('captureBtn').disabled=false;document.getElementById('cameraStatus').textContent='Kamera aktif.'}catch(e){document.getElementById('cameraStatus').textContent='Gagal mengakses kamera: '+e.message}};
+document.getElementById('captureBtn').onclick=async()=>{const nim=document.getElementById('nim').value.trim();if(!nim){alert('Masukkan NIM');return}canvas.width=video.videoWidth;canvas.height=video.videoHeight;canvas.getContext('2d').drawImage(video,0,0);const blob=await new Promise(r=>canvas.toBlob(r,'image/jpeg',0.92));const form=new FormData();form.append('nim',nim);form.append('image',blob,'capture.jpg');let url='/api/verification/verify';const headers={};if(mode.value==='enroll'){const name=document.getElementById('fullName').value.trim();if(!name){alert('Isi nama lengkap');return}form.append('full_name',name);url='/api/registration/enroll';const key=prompt('Masukkan ADMIN_API_KEY untuk enrollment referensi:');if(!key)return;headers['X-Admin-Key']=key}
+ document.getElementById('result').textContent='Memproses...';try{const response=await fetch(url,{method:'POST',headers,body:form});const data=await response.json();document.getElementById('result').textContent=data.decision_status||data.status||('HTTP '+response.status);document.getElementById('details').textContent=data.message||data.detail||('Permintaan selesai: '+(data.status||response.status))}catch(e){document.getElementById('result').textContent='Error';document.getElementById('details').textContent=e.message}};
+window.addEventListener('beforeunload',()=>{if(stream)stream.getTracks().forEach(t=>t.stop())});
+</script></body></html>

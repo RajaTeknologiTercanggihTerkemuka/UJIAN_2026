@@ -1,0 +1,5 @@
+# Dipakai nanti saat membangun backend website.
+fastapi
+uvicorn[standard]
+jinja2
+python-multipart

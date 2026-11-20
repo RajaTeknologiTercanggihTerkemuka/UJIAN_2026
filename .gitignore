@@ -1,0 +1,54 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Environments and secrets
+.venv/
+.venv-mlops/
+venv/
+.env
+.env.*
+!.env.example
+
+# IDE/OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Private biometric data; keep only README placeholders
+Dataset/raw/*/**
+!Dataset/raw/**/README.md
+Dataset/processed/*/**
+!Dataset/processed/**/README.md
+Dataset/metadata/**
+!Dataset/metadata/**/README.md
+Dataset/legacy/**
+!Dataset/legacy/**/README.md
+
+# Large model and biometric artifacts
+*.pth
+*.pt
+*.ckpt
+*.onnx
+*.engine
+Face Recognition/artifacts/**
+MLOps/mlflow/artifacts/**
+MLOps/imports/**
+!MLOps/imports/**/README.md
+
+# Local tracking, databases, logs
+mlflow.db
+mlruns/
+mlartifacts/
+*.sqlite
+*.db
+*.log
+
+# PAD weights and third-party binary artifacts
+Face Recognition/artifacts/antispoof/weights/**
+!Face Recognition/artifacts/antispoof/weights/README.md
+.venv-face-api/

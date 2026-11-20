@@ -1,0 +1,25 @@
+# Historical V1 training configuration (recorded retrospectively).
+architecture: InceptionResnetV1
+pretrained: vggface2
+training_dataset: IMSFD
+training_preprocessing_version: squarepad_resize160_fixedstd_v1
+input_size: 160
+embedding_dim: 512
+objective: ArcFace
+arcface:
+  scale: 64.0
+  margin: 0.50
+partial_finetuning:
+  unfreeze_modules: [repeat_3, block8, last_linear, last_bn]
+  backbone_learning_rate: 0.00001
+  arcface_learning_rate: 0.001
+  weight_decay: 0.0001
+training:
+  epochs: 15
+  batch_size: 16
+  validation_ratio_from_official_training: 0.15
+  seed: 42
+notes:
+  - Historical V1 used SquarePad + Resize + fixed standardization; it did not use MTCNN during training.
+  - Inference uses MTCNN crop; validate this domain/preprocessing change with captured reference/verification data.
+  - Threshold from V1's validation is not automatically transferable to MTCNN inference.

@@ -1,0 +1,4 @@
+[core]
+    remote = private-storage
+['remote "private-storage"']
+    url = E:/DVC/TA-v2-storage

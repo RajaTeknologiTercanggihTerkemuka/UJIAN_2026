@@ -1,0 +1,11 @@
+# Paket umum untuk preprocessing dan inference lokal.
+# Pasang torch/torchvision secara terpisah sesuai OS dan dukungan CPU/CUDA.
+numpy
+pandas
+Pillow
+opencv-python
+scikit-learn
+matplotlib
+scipy
+tqdm
+facenet-pytorch

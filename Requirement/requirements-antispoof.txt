@@ -1,0 +1,4 @@
+# Reuse the face API's PyTorch environment. The official Silent-Face source uses PyTorch and OpenCV.
+# Install torch/torchvision separately and check compatibility.
+opencv-python-headless>=4.9
+numpy>=1.26

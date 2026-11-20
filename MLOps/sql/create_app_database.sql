@@ -1,0 +1,2 @@
+-- Compatibility note: use 01_create_roles.sql followed by 03_create_app_database.sql.
+-- CREATE DATABASE must be executed separately, outside a transaction block.

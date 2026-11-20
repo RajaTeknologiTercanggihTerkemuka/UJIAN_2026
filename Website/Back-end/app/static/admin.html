@@ -1,0 +1,25 @@
+<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Dashboard Operator — TA v2</title>
+<style>
+body{font-family:system-ui;background:#f4f6fa;color:#172033;margin:0;padding:24px}.wrap{max-width:1400px;margin:auto}.card{background:white;padding:20px;border-radius:14px;margin-bottom:18px;box-shadow:0 4px 18px #17203310}input,button{padding:10px;border:1px solid #cbd5e1;border-radius:8px}button{background:#1d4ed8;color:white;border:0;cursor:pointer}table{border-collapse:collapse;width:100%;font-size:12px;display:block;overflow:auto}td,th{border-bottom:1px solid #e2e8f0;padding:9px;text-align:left;white-space:nowrap}.muted{color:#64748b;font-size:13px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:10px}.metric{background:#f8fafc;padding:12px;border-radius:10px}.metric b{display:block;font-size:22px}.warn{color:#9a3412}
+</style></head>
+<body><div class="wrap"><div class="card"><h1>Dashboard Operator</h1><p class="muted">Dashboard penelitian. Hanya operator berwenang. NIM dimasking; jangan bagikan screenshot atau export yang dapat mengidentifikasi peserta.</p><input id="key" type="password" placeholder="ADMIN_API_KEY" style="width:320px;max-width:90%"><button id="load">Muat riwayat</button> <span id="status" class="muted"></span></div>
+<div class="card"><h2>Ringkasan sesi</h2><div id="summary" class="grid"><span class="muted">Belum dimuat.</span></div></div>
+<div class="card"><h2>Riwayat teknis verifikasi</h2><div id="table"></div></div><p><a href="/">Kembali ke halaman kamera</a></p></div>
+<script>
+const esc=(v)=>String(v??'—').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=(v,d=3)=>typeof v==='number'?v.toFixed(d):'—';
+document.getElementById('load').onclick=async()=>{
+ const key=document.getElementById('key').value;const status=document.getElementById('status');status.textContent='Memuat...';
+ try{
+  const r=await fetch('/api/admin/events?limit=200',{headers:{'X-Admin-Key':key}});const data=await r.json();if(!r.ok)throw new Error(data.detail||r.status);
+  const count=s=>data.filter(x=>x.decision_status===s).length;
+  const avg=k=>{const a=data.map(x=>x[k]).filter(v=>typeof v==='number');return a.length?a.reduce((x,y)=>x+y,0)/a.length:null};
+  const items=[['Events',data.length],['MATCH',count('MATCH')],['MISMATCH',count('MISMATCH')],['REVIEW',count('REVIEW_REQUIRED')],['Avg similarity',fmt(avg('similarity_score'))],['Avg detection',fmt(avg('detection_confidence'))],['Avg latency',avg('total_latency_ms')===null?'—':avg('total_latency_ms').toFixed(1)+' ms'],['PAD unknown',data.filter(x=>['unknown','not_configured'].includes(x.antispoof_status)).length]];
+  document.getElementById('summary').innerHTML=items.map(([k,v])=>`<div class="metric"><span class="muted">${esc(k)}</span><b>${esc(v)}</b></div>`).join('');
+  const cols=['created_at','nim_masked','decision_status','detection_confidence','face_count','face_box_area_ratio','similarity_score','threshold_used','antispoof_status','antispoof_score','quality_warnings','detection_latency_ms','embedding_latency_ms','comparison_latency_ms','antispoof_latency_ms','total_latency_ms','model_version','preprocessing_version','threshold_version','failure_reason'];
+  let html='<table><thead><tr>'+cols.map(c=>'<th>'+esc(c)+'</th>').join('')+'</tr></thead><tbody>';
+  for(const row of data){html+='<tr>'+cols.map(c=>'<td>'+esc(typeof row[c]==='object'?JSON.stringify(row[c]):row[c])+'</td>').join('')+'</tr>'}html+='</tbody></table>';
+  document.getElementById('table').innerHTML=html;status.textContent=' '+data.length+' event';
+ }catch(e){status.textContent=' Gagal: '+e.message}
+};
+</script></body></html>

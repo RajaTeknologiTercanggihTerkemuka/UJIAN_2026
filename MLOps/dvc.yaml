@@ -1,0 +1,3 @@
+# Placeholder pipeline; activate stages only after paths and preprocessing script are finalized.
+# DVC data tracking is initially performed with `dvc add` as documented in data_versioning/README.md.
+stages: {}

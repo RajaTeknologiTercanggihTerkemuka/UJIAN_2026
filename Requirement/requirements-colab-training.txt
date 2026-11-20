@@ -1,0 +1,7 @@
+# Dipakai di Google Colab untuk notebook IMSFD.
+# Colab umumnya sudah menyediakan torch dan torchvision; periksa runtime sebelum mengubah versinya.
+facenet-pytorch
+scikit-learn
+pandas
+matplotlib
+tqdm

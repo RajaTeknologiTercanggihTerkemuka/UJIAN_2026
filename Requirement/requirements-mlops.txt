@@ -1,0 +1,6 @@
+# Separate environment: .venv-mlops
+mlflow==3.18.0
+psycopg[binary]>=3.2
+python-dotenv>=1.0
+pandas>=2.0
+PyYAML>=6.0
