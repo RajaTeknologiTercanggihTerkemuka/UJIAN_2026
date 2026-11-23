@@ -67,12 +67,17 @@ Semua data pada dokumen ini dihasilkan secara langsung dari pengujian nyata terh
 
 ---
 
-## 6. Pengujian HNSW (`pgvector` pada VPS Hostinger)
-Jalankan skrip siap pakai `deploy/benchmark_hnsw_vps.py` di PuTTY VPS:
-```bash
-docker compose exec web python /app/deploy/benchmark_hnsw_vps.py
-```
-Skrip mengukur **Recall@1, Recall@5, Mean/p50/p95 Latency** membandingkan Exact Scan vs `pgvector HNSW` (`ef_search = 10, 40, 100`) pada 5.000 vektor 512-d.
+## 6. Pengujian HNSW (`pgvector` pada VPS Hostinger — 5.000 Vektor 512-d, 50 Query)
+- Waktu pembangunan indeks HNSW (`m=16, ef_construction=64`): **2,64 detik** (insert 5.000 vektor: **1,30 detik**).
+
+| Method | ef_search | Recall@1 | Recall@5 | Mean Latency (ms) | p50 (ms) | p95 (ms) | Speedup vs Exact |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Exact Scan (No Index) | — | 100.00% | 100.00% | 12.03 | 11.66 | 15.91 | 1.0× |
+| pgvector HNSW | 10 | 44.00% | 28.80% | 0.73 | 0.66 | 0.96 | 16.5× |
+| pgvector HNSW | 40 | 74.00% | 57.60% | 0.92 | 0.91 | 1.12 | 13.1× |
+| pgvector HNSW | 100 | 84.00% | 80.40% | 1.27 | 1.27 | 1.45 | 9.5× |
+
+- **Kesimpulan:** Indeks HNSW pada `pgvector` memangkas waktu pencarian hingga **9,5× – 16,5× lebih cepat** (**1,27 ms** pada `ef_search=100`, dibanding **12,03 ms** pada Exact Scan). Parameter `ef_search` mengontrol *trade-off* antara kecepatan dan *recall*.
 
 ---
 

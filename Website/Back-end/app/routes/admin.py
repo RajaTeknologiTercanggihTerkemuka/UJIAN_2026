@@ -372,6 +372,7 @@ def mlops_overview(
     return {
         'mlflow': {
             'tracking_uri': tracking_uri,
+            'public_url': os.getenv('MLFLOW_PUBLIC_URL', tracking_uri).strip(),
             'online': mlflow_online,
             'experiment_name': 'TA-v2-Face-Recognition',
             'imported_run_id': '8215ce4898564b3c8bf585b2719155a9',

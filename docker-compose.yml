@@ -10,12 +10,24 @@ services:
     volumes:
       - ta_v2_pgdata:/var/lib/postgresql/data
       - ./Website/Back-end/sql/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
-    # Sengaja TIDAK expose port 5432 ke host agar tidak bentrok dengan DB lain di VPS
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-face_app_user} -d ${POSTGRES_DB:-face_registration}"]
       interval: 5s
       timeout: 5s
       retries: 12
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v2.17.2
+    container_name: ta_v2_mlflow
+    restart: unless-stopped
+    command: >
+      mlflow server
+      --backend-store-uri sqlite:////mlflow/mlflow.db
+      --default-artifact-root /mlflow/artifacts
+      --host 0.0.0.0
+      --port 5000
+    volumes:
+      - ta_v2_mlflow_data:/mlflow
 
   web:
     build:
@@ -26,10 +38,14 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      mlflow:
+        condition: service_started
     env_file:
       - .env
     environment:
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-face_app_user}:${POSTGRES_PASSWORD:-CHANGE_STRONG_DB_PASSWORD}@db:5432/${POSTGRES_DB:-face_registration}
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+      MLFLOW_PUBLIC_URL: ${MLFLOW_PUBLIC_URL:-https://mlflow.153.92.5.145.sslip.io}
       FACE_DEVICE: cpu
     ports:
       # Port 8010 (aman dari port 8000 milik aplikasi temanmu). Ubah APP_HOST_BIND=127.0.0.1 jika sudah pakai Nginx HTTPS.
@@ -41,3 +57,4 @@ services:
 
 volumes:
   ta_v2_pgdata:
+  ta_v2_mlflow_data:

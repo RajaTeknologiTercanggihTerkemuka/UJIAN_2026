@@ -519,7 +519,7 @@
     const mlfBadge = document.getElementById('mlflowStatusBadge');
     mlfBadge.className = 'badge ' + (mlf.online ? 'badge-green' : 'badge-amber');
     mlfBadge.textContent = mlf.online ? 'MLflow: ONLINE' : 'MLflow: OFFLINE (Artefak Lokal Aktif)';
-    if (mlf.tracking_uri) document.getElementById('mlflowLink').href = mlf.tracking_uri;
+    if (mlf.public_url || mlf.tracking_uri) document.getElementById('mlflowLink').href = mlf.public_url || mlf.tracking_uri;
 
     const tm = mlops.verification_test_metrics || {};
     const ft = mlops.face_threshold_calibration || {};

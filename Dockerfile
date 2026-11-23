@@ -39,6 +39,7 @@ COPY Dataset/raw/IMSFD_original.dvc /app/Dataset/raw/IMSFD_original.dvc
 COPY Dataset/raw/UTBK_reference_images.dvc /app/Dataset/raw/UTBK_reference_images.dvc
 COPY deploy/entrypoint.sh /app/deploy/entrypoint.sh
 COPY deploy/benchmark_hnsw_vps.py /app/deploy/benchmark_hnsw_vps.py
+COPY deploy/seed_mlflow_vps.py /app/deploy/seed_mlflow_vps.py
 
 RUN sed -i 's/\r$//' /app/deploy/entrypoint.sh \
     && chmod +x /app/deploy/entrypoint.sh \
