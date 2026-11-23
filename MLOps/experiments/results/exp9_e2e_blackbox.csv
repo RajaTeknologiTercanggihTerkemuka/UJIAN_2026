@@ -1,0 +1,13 @@
+test_id,scenario,expected,actual,status,latency_ms
+TC-01,Health Check API,HTTP 200 & model_ready=True,"HTTP 200, ready=True",PASS,19.5
+TC-02,Admin Tanpa Password (Security),HTTP 401 Unauthorized,HTTP 401,PASS,29.4
+TC-03,Admin Login Valid (1234),HTTP 200,HTTP 200 (851B),PASS,52.1
+TC-04,MLOps & Drift Panel API,HTTP 200,HTTP 200 (4512B),PASS,1259.6
+TC-05,Prometheus /metrics Endpoint,HTTP 200,HTTP 200 (6342B),PASS,16.0
+TC-06,Validasi NIM < 8 Digit,HTTP 422,HTTP 422 (NIM harus terdiri dari 8 hingga 9 digit angka (contoh: 04221001).),PASS,92.2
+TC-07,Kamera Kosong (No Face),HTTP 422 no_face,HTTP 422 (no_face),PASS,50.5
+TC-08,Dua Wajah Sekaligus (Multiple Faces),HTTP 422 multiple_faces,HTTP 422 (multiple_faces),PASS,102.6
+TC-09,Active Liveness Gagal pada Wajah Statis,REJECTED_SPOOF,REJECTED_SPOOF,PASS,764.2
+TC-10,Serangan Foto Cetak (PAD MiniFASNetV2),REJECTED_SPOOF,REJECTED_SPOOF,PASS,760.4
+TC-11,Verifikasi Nama Tidak Cocok NIM,HTTP 422,HTTP 422 (Nama tidak sesuai dengan NIM yang terdaftar.),PASS,27.8
+TC-12,Joki Tipe B (HTTP Duplikat Wajah 1:N),REJECTED_DUPLICATE_FACE,REJECTED_DUPLICATE_FACE,PASS,720.3

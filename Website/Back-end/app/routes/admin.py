@@ -300,7 +300,6 @@ def mlops_overview(
         x
         for x in [
             _parse_dvc_pointer(PROJECT_ROOT / 'Dataset' / 'raw' / 'IMSFD_original.dvc'),
-            _parse_dvc_pointer(PROJECT_ROOT / 'Dataset' / 'raw' / 'UTBK_reference_images.dvc'),
         ]
         if x is not None
     ]

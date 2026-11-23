@@ -266,6 +266,20 @@ body {
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
+.field input.input-invalid {
+  border-color: #c24141;
+  box-shadow: 0 0 0 3px rgba(194, 65, 65, 0.14);
+}
+
+.field-error {
+  display: block;
+  min-height: 16px;
+  margin-top: 5px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #b83232;
+}
+
 /* Source Mode Switcher */
 .mode-switch {
   display: inline-flex;

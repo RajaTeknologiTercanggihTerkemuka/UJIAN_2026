@@ -1,0 +1,6 @@
+attack_type,class,samples,mean_live_score,median_live_score,error_metric,error_rate_pct,correct_rate_pct
+cut-out printouts,Attack (Spoof),100,0.4036,0.2443,APCER,42.0,58.0
+live_selfie,Bona Fide (Live),4,0.8807,0.8816,BPCER,0.0,100.0
+live_video,Bona Fide (Live),97,0.9203,0.9929,BPCER,2.06,97.94
+printouts,Attack (Spoof),93,0.05,0.0001,APCER,4.3,95.7
+replay,Attack (Spoof),95,0.1641,0.001,APCER,17.89,82.11

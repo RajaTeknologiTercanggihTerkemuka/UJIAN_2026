@@ -1,0 +1,4 @@
+condition,brightness_factor,gaussian_blur_radius,detection_rate_pct,avg_genuine_similarity,simulated_failure_rate_pct,drift_monitor_status
+Normal (Baseline),1.0,0.0,100.0,0.8647,5.0,HEALTHY
+Drift Ringan (Gelap + Blur Ringan),0.4,2.2,100.0,0.8577,30.0,DRIFT_WARNING
+Drift Berat (Sangat Gelap + Blur Kuat),0.22,4.2,100.0,0.7856,55.0,RETRAINING_RECOMMENDED

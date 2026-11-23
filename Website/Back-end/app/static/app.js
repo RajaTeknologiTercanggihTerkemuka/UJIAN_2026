@@ -41,20 +41,62 @@
     }
   }
 
-  // ==================== INPUT VALIDATION (NAMA & NIM 8-9 DIGIT) ====================
-  function validateIdentityFields(scope) {
-    const name = document.getElementById(scope + 'Name').value.trim();
-    const nim = document.getElementById(scope + 'Nim').value.trim();
-    if (!name) {
-      showResult(scope, 'VALIDASI GAGAL', 'Nama wajib diisi terlebih dahulu sebelum mengaktifkan kamera.', '');
-      return null;
+  // ==================== INPUT VALIDATION (REAL-TIME NAMA & NIM 8-9 DIGIT) ====================
+  function updateFieldValidation(scope, showEmptyErrors = false) {
+    const nameInput = document.getElementById(scope + 'Name');
+    const nimInput = document.getElementById(scope + 'Nim');
+    const nameErr = document.getElementById(scope + 'NameError');
+    const nimErr = document.getElementById(scope + 'NimError');
+    const startBtn = document.getElementById(scope + 'StartCam');
+    const submitBtn = document.getElementById(scope + 'SubmitCam');
+
+    const name = nameInput.value.trim();
+    const nim = nimInput.value.trim();
+    let nameOk = name.length > 0;
+    let nimOk = NIM_REGEX.test(nim);
+
+    if (!nameOk && showEmptyErrors) {
+      nameErr.textContent = 'Nama wajib diisi.';
+      nameInput.classList.add('input-invalid');
+    } else {
+      nameErr.textContent = '';
+      nameInput.classList.remove('input-invalid');
     }
-    if (!NIM_REGEX.test(nim)) {
-      showResult(scope, 'VALIDASI GAGAL', 'NIM harus terdiri dari 8 hingga 9 digit angka saja (contoh: 04221001).', '');
-      return null;
+
+    if (nim.length > 0 && !nimOk) {
+      nimErr.textContent = 'NIM harus 8–9 digit angka (contoh: 04221001).';
+      nimInput.classList.add('input-invalid');
+    } else if (nim.length === 0 && showEmptyErrors) {
+      nimErr.textContent = 'NIM wajib diisi (8–9 digit angka).';
+      nimInput.classList.add('input-invalid');
+    } else {
+      nimErr.textContent = '';
+      nimInput.classList.remove('input-invalid');
     }
-    return { name, nim };
+
+    const allValid = nameOk && nimOk;
+    startBtn.disabled = !allValid;
+    if (!allValid && state.streams[scope]) {
+      submitBtn.disabled = true;
+    } else if (allValid && state.streams[scope]) {
+      submitBtn.disabled = false;
+    }
+    return allValid ? { name, nim } : null;
   }
+
+  function validateIdentityFields(scope) {
+    const res = updateFieldValidation(scope, true);
+    if (!res) {
+      showResult(scope, 'VALIDASI GAGAL', 'Pastikan Nama terisi dan NIM terdiri dari 8–9 digit angka (contoh: 04221001).', '');
+    }
+    return res;
+  }
+
+  ['reg', 'ver'].forEach((scope) => {
+    document.getElementById(scope + 'Name').addEventListener('input', () => updateFieldValidation(scope, false));
+    document.getElementById(scope + 'Nim').addEventListener('input', () => updateFieldValidation(scope, false));
+    updateFieldValidation(scope, false);
+  });
 
   // ==================== TAB NAVIGATION & THEME ====================
   function stopAllStreams() {

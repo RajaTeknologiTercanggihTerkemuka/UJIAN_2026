@@ -25,20 +25,23 @@ RUN pip install --no-deps facenet-pytorch==2.6.0 \
     && pip install -r /app/Requirement/requirements-vps.txt
 
 # 3. Copy lightweight application, inference code, SQL migrations, and tiny MLOps JSON/CSV metadata
+# Note: JSON array syntax is required by Dockerfile COPY for paths containing spaces ("Face Recognition").
 COPY Website/Back-end /app/Website/Back-end
-COPY "Face Recognition/src" "/app/Face Recognition/src"
-COPY "Face Recognition/third_party/Silent-Face-Anti-Spoofing/src" "/app/Face Recognition/third_party/Silent-Face-Anti-Spoofing/src"
-COPY "Face Recognition/artifacts/exported_models/imsfd_partial_ft_v1/model_metadata.json" "/app/Face Recognition/artifacts/exported_models/imsfd_partial_ft_v1/model_metadata.json"
-COPY "Face Recognition/artifacts/thresholds/threshold_v1.json" "/app/Face Recognition/artifacts/thresholds/threshold_v1.json"
-COPY "Face Recognition/artifacts/thresholds/pad_threshold_v1.json" "/app/Face Recognition/artifacts/thresholds/pad_threshold_v1.json"
-COPY "MLOps/imports/imsfd_partial_ft_v1/verification_metrics_test.json" "/app/MLOps/imports/imsfd_partial_ft_v1/verification_metrics_test.json"
-COPY "MLOps/imports/imsfd_partial_ft_v1/training_history.csv" "/app/MLOps/imports/imsfd_partial_ft_v1/training_history.csv"
-COPY "MLOps/imports/imsfd_partial_ft_v1/01_audit/audit_summary.json" "/app/MLOps/imports/imsfd_partial_ft_v1/01_audit/audit_summary.json"
+COPY ["Face Recognition/src", "/app/Face Recognition/src"]
+COPY ["Face Recognition/third_party/Silent-Face-Anti-Spoofing/src", "/app/Face Recognition/third_party/Silent-Face-Anti-Spoofing/src"]
+COPY ["Face Recognition/artifacts/exported_models/imsfd_partial_ft_v1/model_metadata.json", "/app/Face Recognition/artifacts/exported_models/imsfd_partial_ft_v1/model_metadata.json"]
+COPY ["Face Recognition/artifacts/thresholds/threshold_v1.json", "/app/Face Recognition/artifacts/thresholds/threshold_v1.json"]
+COPY ["Face Recognition/artifacts/thresholds/pad_threshold_v1.json", "/app/Face Recognition/artifacts/thresholds/pad_threshold_v1.json"]
+COPY MLOps/imports/imsfd_partial_ft_v1/verification_metrics_test.json /app/MLOps/imports/imsfd_partial_ft_v1/verification_metrics_test.json
+COPY MLOps/imports/imsfd_partial_ft_v1/training_history.csv /app/MLOps/imports/imsfd_partial_ft_v1/training_history.csv
+COPY MLOps/imports/imsfd_partial_ft_v1/01_audit/audit_summary.json /app/MLOps/imports/imsfd_partial_ft_v1/01_audit/audit_summary.json
 COPY Dataset/raw/IMSFD_original.dvc /app/Dataset/raw/IMSFD_original.dvc
 COPY Dataset/raw/UTBK_reference_images.dvc /app/Dataset/raw/UTBK_reference_images.dvc
 COPY deploy/entrypoint.sh /app/deploy/entrypoint.sh
+COPY deploy/benchmark_hnsw_vps.py /app/deploy/benchmark_hnsw_vps.py
 
-RUN chmod +x /app/deploy/entrypoint.sh \
+RUN sed -i 's/\r$//' /app/deploy/entrypoint.sh \
+    && chmod +x /app/deploy/entrypoint.sh \
     && mkdir -p "/app/Face Recognition/artifacts/exported_models/imsfd_partial_ft_v1" \
                 "/app/Face Recognition/artifacts/antispoof/weights"
 

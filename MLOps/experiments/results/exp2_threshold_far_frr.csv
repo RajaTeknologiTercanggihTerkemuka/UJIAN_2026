@@ -1,0 +1,8 @@
+target_threshold,actual_threshold,FAR_pct,FRR_pct,role
+0.25,0.2502,4.453,0.377,Titik Uji
+0.3,0.3002,1.555,0.423,Titik Uji
+0.3651,0.3651,0.423,0.423,Optimal EER (Aktif 1:1 Verify)
+0.45,0.4423,0.03,0.468,Titik Uji
+0.5519,0.5519,0.0,0.694,FAR=0% Validasi IMSFD
+0.65,0.6504,0.0,1.525,Titik Uji
+0.75,0.7504,0.0,4.362,Aktif 1:N Anti-Joki (12.886 galeri)

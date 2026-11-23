@@ -1,0 +1,49 @@
+scenario,expected,actual,passed,similarity,pad_score,total_ms,strict_spoof_blocked
+Verifikasi Sah (Genuine),MATCH,MATCH,True,0.9095,0.99,901.2,
+Verifikasi Sah (Genuine),MATCH,MATCH,True,0.9319,0.99,157.6,
+Verifikasi Sah (Genuine),MATCH,MATCH,True,0.8467,0.99,170.6,
+Verifikasi Sah (Genuine),MATCH,MATCH,True,0.884,0.99,166.0,
+Verifikasi Sah (Genuine),MATCH,MATCH,True,1.0,0.99,226.1,
+Verifikasi Sah (Genuine),MATCH,MATCH,True,0.8404,0.99,192.3,
+Verifikasi Sah (Genuine),MATCH,MATCH,True,0.8525,0.99,170.0,
+Verifikasi Sah (Genuine),MATCH,MATCH,True,0.9297,0.99,157.6,
+Verifikasi Sah (Genuine),MATCH,MATCH,True,0.8433,0.99,215.9,
+Verifikasi Sah (Genuine),MATCH,MATCH,True,0.8701,0.99,203.3,
+Verifikasi Sah (Genuine),MATCH,MATCH,True,0.8526,0.99,162.9,
+Verifikasi Sah (Genuine),MATCH,MATCH,True,0.8291,0.99,147.4,
+Verifikasi Sah (Genuine),MATCH,MATCH,True,0.9239,0.99,179.0,
+Verifikasi Sah (Genuine),MATCH,MATCH,True,1.0,0.99,152.2,
+Joki Tipe A (Penggantian Orang 1:1),MISMATCH,MISMATCH,True,0.0955,0.99,137.6,
+Joki Tipe A (Penggantian Orang 1:1),MISMATCH,MISMATCH,True,0.0713,0.99,126.4,
+Joki Tipe A (Penggantian Orang 1:1),MISMATCH,MISMATCH,True,-0.1277,0.99,127.6,
+Joki Tipe A (Penggantian Orang 1:1),MISMATCH,MISMATCH,True,0.1947,0.99,167.3,
+Joki Tipe A (Penggantian Orang 1:1),MISMATCH,MISMATCH,True,0.1281,0.99,123.2,
+Joki Tipe A (Penggantian Orang 1:1),MISMATCH,MISMATCH,True,-0.1945,0.99,140.9,
+Joki Tipe A (Penggantian Orang 1:1),MISMATCH,MISMATCH,True,-0.1341,0.99,133.2,
+Joki Tipe A (Penggantian Orang 1:1),MISMATCH,MISMATCH,True,0.0627,0.99,181.1,
+Joki Tipe A (Penggantian Orang 1:1),MISMATCH,MISMATCH,True,-0.0881,0.99,121.3,
+Joki Tipe A (Penggantian Orang 1:1),MISMATCH,MISMATCH,True,0.0997,0.99,140.3,
+Joki Tipe A (Penggantian Orang 1:1),MISMATCH,MISMATCH,True,-0.387,0.99,134.4,
+Joki Tipe A (Penggantian Orang 1:1),MISMATCH,MISMATCH,True,0.13,0.99,171.9,
+Joki Tipe A (Penggantian Orang 1:1),MISMATCH,MISMATCH,True,0.1957,0.99,129.4,
+Joki Tipe A (Penggantian Orang 1:1),MISMATCH,MISMATCH,True,0.2309,0.99,682.3,
+Joki Tipe A Spoof (printouts),REJECTED_SPOOF,REJECTED_SPOOF,True,0.2353,0.0,747.1,True
+Joki Tipe A Spoof (replay),REJECTED_SPOOF,REJECTED_SPOOF,True,-0.0219,0.0002,751.0,True
+Joki Tipe A Spoof (printouts),REJECTED_SPOOF,REJECTED_SPOOF,True,0.0254,0.0,2422.1,True
+Joki Tipe A Spoof (printouts),REJECTED_SPOOF,no_face,False,0.0,0.0,0.0,False
+Joki Tipe A Spoof (replay),REJECTED_SPOOF,REJECTED_SPOOF,True,0.097,0.0001,677.8,True
+Joki Tipe A Spoof (printouts),REJECTED_SPOOF,REJECTED_SPOOF,True,-0.0533,0.0001,3046.2,True
+Joki Tipe A Spoof (replay),REJECTED_SPOOF,REJECTED_SPOOF,True,0.0938,0.0185,1064.2,True
+Joki Tipe A Spoof (replay),REJECTED_SPOOF,REJECTED_SPOOF,True,-0.2725,0.0023,893.5,True
+Joki Tipe A Spoof (printouts),REJECTED_SPOOF,REJECTED_SPOOF,True,0.0749,0.0001,2258.1,True
+Joki Tipe A Spoof (printouts),REJECTED_SPOOF,REJECTED_SPOOF,True,0.0899,0.0,1929.4,True
+Joki Tipe A Spoof (printouts),REJECTED_SPOOF,REJECTED_SPOOF,True,0.2633,0.0028,577.4,True
+Joki Tipe A Spoof (replay),REJECTED_SPOOF,REJECTED_SPOOF,True,-0.0689,0.4118,541.7,True
+Joki Tipe A Spoof (replay),REJECTED_SPOOF,REJECTED_SPOOF,True,-0.0504,0.0022,601.3,True
+Joki Tipe A Spoof (printouts),REJECTED_SPOOF,REJECTED_SPOOF,True,0.1137,0.0001,2373.2,True
+Joki Tipe A Spoof (printouts),REJECTED_SPOOF,multiple_faces,False,0.0,0.0,0.0,False
+Joki Tipe A Spoof (replay),REJECTED_SPOOF,REJECTED_SPOOF,True,0.1625,0.0,649.3,True
+Joki Tipe A Spoof (replay),REJECTED_SPOOF,REJECTED_SPOOF,True,-0.0194,0.0013,552.0,True
+Joki Tipe A Spoof (replay),REJECTED_SPOOF,REJECTED_SPOOF,True,0.0402,0.0001,612.0,True
+Joki Tipe A Spoof (replay),REJECTED_SPOOF,REJECTED_SPOOF,True,-0.0965,0.0534,696.0,True
+Joki Tipe A Spoof (replay),REJECTED_SPOOF,REJECTED_SPOOF,True,-0.2416,0.0,865.1,True

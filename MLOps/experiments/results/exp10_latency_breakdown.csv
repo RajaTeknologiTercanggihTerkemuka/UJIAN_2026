@@ -1,0 +1,5 @@
+stage,mean_ms,p95_ms
+1. Deteksi & Crop Wajah (MTCNN),613.13,2116.11
+2. Anti-Spoofing PAD (MiniFASNetV2),31.15,68.0
+3. Ekstraksi Embedding (InceptionResNetV1),89.47,118.28
+4. Pencarian Vektor 1:N (12.886+ wajah),1.75,1.98

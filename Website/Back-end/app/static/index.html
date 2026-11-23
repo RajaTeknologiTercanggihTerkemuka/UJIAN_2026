@@ -41,10 +41,12 @@
           <div class="field">
             <label for="regName">Nama</label>
             <input id="regName" type="text" autocomplete="off" placeholder="Contoh: Fauzi">
+            <small id="regNameError" class="field-error"></small>
           </div>
           <div class="field">
             <label for="regNim">NIM (8–9 digit angka)</label>
             <input id="regNim" type="text" inputmode="numeric" maxlength="9" autocomplete="off" placeholder="Contoh: 04221001">
+            <small id="regNimError" class="field-error"></small>
           </div>
         </div>
 
@@ -59,7 +61,7 @@
           </div>
           <div class="controls-row">
             <div class="btn-group">
-              <button type="button" id="regStartCam" class="btn btn-soft">Aktifkan Kamera</button>
+              <button type="button" id="regStartCam" class="btn btn-soft" disabled>Aktifkan Kamera</button>
               <button type="button" id="regSubmitCam" class="btn btn-primary" disabled>Pindai Wajah &amp; Daftar</button>
             </div>
             <label class="checkbox-label">
@@ -91,10 +93,12 @@
           <div class="field">
             <label for="verName">Nama</label>
             <input id="verName" type="text" autocomplete="off" placeholder="Contoh: Fauzi">
+            <small id="verNameError" class="field-error"></small>
           </div>
           <div class="field">
             <label for="verNim">NIM (8–9 digit angka)</label>
             <input id="verNim" type="text" inputmode="numeric" maxlength="9" autocomplete="off" placeholder="Contoh: 04221001">
+            <small id="verNimError" class="field-error"></small>
           </div>
         </div>
 
@@ -109,7 +113,7 @@
           </div>
           <div class="controls-row">
             <div class="btn-group">
-              <button type="button" id="verStartCam" class="btn btn-soft">Aktifkan Kamera</button>
+              <button type="button" id="verStartCam" class="btn btn-soft" disabled>Aktifkan Kamera</button>
               <button type="button" id="verSubmitCam" class="btn btn-primary" disabled>Pindai &amp; Verifikasi Wajah</button>
             </div>
             <label class="checkbox-label">
