@@ -19,6 +19,7 @@ def main():
     parser.add_argument('--image-column', default='image_path')
     parser.add_argument('--label-column', default='label', help='1=bona fide, 0=attack')
     parser.add_argument('--output', required=True)
+    parser.add_argument('--detect-max-side', type=int, default=640, help='Downscale large images proportionally for MTCNN box detection only; PAD still crops from original frame.')
     args = parser.parse_args()
 
     manifest_path = Path(args.manifest).resolve()
@@ -39,24 +40,35 @@ def main():
     provider = SilentFaceMiniFASNetProvider(weights_dir, repo_root, device, live_threshold=None)
 
     out_rows = []
-    for row in df.to_dict('records'):
+    total = len(df)
+    for idx, row in enumerate(df.to_dict('records'), start=1):
         raw_path = Path(str(row[args.image_column]))
         path = raw_path if raw_path.is_absolute() else (manifest_path.parent / raw_path).resolve()
         item = dict(row)
         try:
             with Image.open(path) as image:
                 image = ImageOps.exif_transpose(image).convert('RGB')
+                orig_w, orig_h = image.size
                 arr = np.asarray(image, dtype=np.uint8)
-            boxes, probs = mtcnn.detect(Image.fromarray(arr))
+                max_side = max(orig_w, orig_h)
+                if args.detect_max_side > 0 and max_side > args.detect_max_side:
+                    scale = args.detect_max_side / float(max_side)
+                    det_img = image.resize((max(1, int(round(orig_w * scale))), max(1, int(round(orig_h * scale)))), Image.BILINEAR)
+                else:
+                    scale = 1.0
+                    det_img = image
+            boxes, probs = mtcnn.detect(det_img)
             if boxes is None or len(boxes) != 1:
                 item.update({'pad_live_score': None, 'pad_status': 'invalid_face_count', 'error': f'face_count={0 if boxes is None else len(boxes)}'})
             else:
-                x1, y1, x2, y2 = [float(v) for v in boxes[0]]
-                result = provider.predict(arr, [x1, y1, x2-x1, y2-y1])
+                x1, y1, x2, y2 = [float(v) / scale for v in boxes[0]]
+                result = provider.predict(arr, [x1, y1, x2 - x1, y2 - y1])
                 item.update({'pad_live_score': result.score, 'pad_status': result.status, 'error': result.reason})
         except Exception as exc:
             item.update({'pad_live_score': None, 'pad_status': 'error', 'error': repr(exc)})
         out_rows.append(item)
+        if idx % 50 == 0 or idx == total:
+            print(f'[{manifest_path.name}] {idx}/{total} selesai...', flush=True)
 
     output_path = Path(args.output).resolve()
     output_path.parent.mkdir(parents=True, exist_ok=True)

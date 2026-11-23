@@ -1,0 +1,20 @@
+{
+  "architecture": "InceptionResnetV1",
+  "initial_weights": "VGGFace2",
+  "adaptation": "partial_fine_tuning",
+  "training_dataset": "IMSFD",
+  "training_objective": "ArcFace + CrossEntropyLoss",
+  "unfrozen_modules": [
+    "repeat_3",
+    "block8",
+    "last_linear",
+    "last_bn"
+  ],
+  "embedding_dim": 512,
+  "input_size": [
+    3,
+    160,
+    160
+  ],
+  "num_training_identities": 68
+}

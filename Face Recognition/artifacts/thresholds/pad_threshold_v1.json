@@ -1,0 +1,26 @@
+{
+  "method": "validation_min_ACER_tiebreak_APCER",
+  "threshold": 0.4302303344011307,
+  "validation_metrics": {
+    "TN_attack_reject": 280.0,
+    "FP_attack_accept": 55.0,
+    "FN_bona_fide_reject": 2.0,
+    "TP_bona_fide_accept": 127.0,
+    "APCER": 0.16417910447761194,
+    "BPCER": 0.015503875968992248,
+    "ACER": 0.0898414902233021
+  },
+  "validation_samples_used": 464,
+  "warning": "Threshold hanya berlaku pada model PAD, kamera, dan protokol capture ini. Bekukan threshold sebelum menguji test set.",
+  "test_metrics_at_frozen_validation_threshold": {
+    "TN_attack_reject": 225,
+    "FP_attack_accept": 63,
+    "FN_bona_fide_reject": 2,
+    "TP_bona_fide_accept": 99,
+    "APCER": 0.21875,
+    "BPCER": 0.019801980198019802,
+    "ACER": 0.1192759900990099,
+    "ROC_AUC": 0.9509763476347635
+  },
+  "test_samples_used": 389
+}

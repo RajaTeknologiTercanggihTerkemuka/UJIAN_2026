@@ -1,0 +1,58 @@
+name: CI/CD — Test & Deploy to Hostinger VPS
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  ci-verify:
+    name: CI — Syntax & Packaging Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Compile-check Backend & FaceID Python modules
+        run: |
+          python -m compileall -q "Website/Back-end/app" "Face Recognition/src/faceid"
+          test -f Dockerfile
+          test -f docker-compose.yml
+          test -f Requirement/requirements-vps.txt
+
+  cd-deploy-vps:
+    name: CD — Deploy Docker Stack to Hostinger VPS
+    needs: ci-verify
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH (skipped if VPS_HOST secret is not set)
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_APP_DIR: ${{ secrets.VPS_APP_DIR }}
+        run: |
+          if [ -z "$VPS_HOST" ] || [ -z "$VPS_USER" ] || [ -z "$VPS_SSH_KEY" ]; then
+            echo "VPS secrets belum dikonfigurasi di GitHub Settings > Secrets. Melewati auto-deploy."
+            exit 0
+          fi
+          mkdir -p ~/.ssh
+          printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan -H "$VPS_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+          APP_DIR="${VPS_APP_DIR:-~/ta-v2-face}"
+          ssh -i ~/.ssh/id_deploy "${VPS_USER}@${VPS_HOST}" "
+            set -e
+            cd ${APP_DIR}
+            git pull origin main
+            docker compose up -d --build
+            sleep 6
+            curl -fsS http://127.0.0.1:8010/api/health
+          "

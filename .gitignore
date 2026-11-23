@@ -12,6 +12,7 @@ venv/
 .env
 .env.*
 !.env.example
+!.env.vps.example
 
 # IDE/OS
 .vscode/
@@ -36,9 +37,20 @@ Dataset/legacy/**
 *.onnx
 *.engine
 Face Recognition/artifacts/**
+!Face Recognition/artifacts/exported_models/
+!Face Recognition/artifacts/exported_models/imsfd_partial_ft_v1/
+!Face Recognition/artifacts/exported_models/imsfd_partial_ft_v1/model_metadata.json
+!Face Recognition/artifacts/thresholds/
+!Face Recognition/artifacts/thresholds/threshold_v1.json
+!Face Recognition/artifacts/thresholds/pad_threshold_v1.json
 MLOps/mlflow/artifacts/**
 MLOps/imports/**
 !MLOps/imports/**/README.md
+!MLOps/imports/imsfd_partial_ft_v1/
+!MLOps/imports/imsfd_partial_ft_v1/verification_metrics_test.json
+!MLOps/imports/imsfd_partial_ft_v1/training_history.csv
+!MLOps/imports/imsfd_partial_ft_v1/01_audit/
+!MLOps/imports/imsfd_partial_ft_v1/01_audit/audit_summary.json
 
 # Local tracking, databases, logs
 mlflow.db
@@ -52,3 +64,9 @@ mlartifacts/
 Face Recognition/artifacts/antispoof/weights/**
 !Face Recognition/artifacts/antispoof/weights/README.md
 .venv-face-api/
+
+# Private enrollment diagnostics and local demo manifests
+MLOps/private_*.csv
+Website/Back-end/scripts/demo_identities_manifest.json
+deploy/demo_seed.sql
+Face Recognition/third_party/Silent-Face-Anti-Spoofing/

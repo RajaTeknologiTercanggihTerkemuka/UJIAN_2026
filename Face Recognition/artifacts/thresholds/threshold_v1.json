@@ -1,0 +1,14 @@
+{
+  "threshold": 0.3650529384613037,
+  "validation_far": 0.004226415094339623,
+  "validation_frr": 0.004226415094339623,
+  "eer_estimate": 0.004226415094339623,
+  "target_far": null,
+  "genuine_pairs": 6625,
+  "impostor_pairs": 6625,
+  "validation_identities": 68,
+  "model_version": "imsfd_partial_ft_v1",
+  "preprocessing_version": "mtcnn160_margin20_fixedstd_v1",
+  "threshold_version": "threshold_v1",
+  "selection": "min_absolute_far_frr_gap_eer_estimate"
+}

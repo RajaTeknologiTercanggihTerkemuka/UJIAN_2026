@@ -12,6 +12,8 @@ MAX_UPLOAD = int(os.getenv('MAX_UPLOAD_MB', '8')) * 1024 * 1024
 async def verify_claimed_identity(
     request: Request,
     nim: str = Form(...),
+    full_name: str = Form(''),
+    active_liveness_passed: bool = Form(True),
     image: UploadFile = File(...),
     db: Session = Depends(get_db),
 ):
@@ -25,7 +27,7 @@ async def verify_claimed_identity(
     try:
         detailed = verify_one_to_one(
             db, request.app.state.face_engine, request.app.state.antispoof,
-            nim, payload, request_id
+            nim, payload, request_id, full_name=full_name, active_liveness_passed=active_liveness_passed,
         )
         # Do not reveal similarity, threshold, PAD score, model version, or detailed
         # diagnostics in the participant-facing response.

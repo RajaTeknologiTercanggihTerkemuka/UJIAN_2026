@@ -1,15 +1,22 @@
 from __future__ import annotations
 import os
+from pathlib import Path
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
+
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
+load_dotenv(PROJECT_ROOT / '.env', override=False)
 
 DATABASE_URL = os.getenv('DATABASE_URL', 'sqlite:///./face_registration_dev.db')
 connect_args = {'check_same_thread': False} if DATABASE_URL.startswith('sqlite') else {}
 engine = create_engine(DATABASE_URL, pool_pre_ping=True, connect_args=connect_args)
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
+
 class Base(DeclarativeBase):
     pass
+
 
 def get_db():
     db = SessionLocal()

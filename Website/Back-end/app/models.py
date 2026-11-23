@@ -4,14 +4,22 @@ from sqlalchemy import String, Integer, Float, Boolean, DateTime, ForeignKey, Te
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database import Base
 
+
 class User(Base):
     __tablename__ = 'users'
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     nim: Mapped[str] = mapped_column(String(80), unique=True, index=True, nullable=False)
     full_name: Mapped[str] = mapped_column(String(200), nullable=False)
+    exam_year: Mapped[int] = mapped_column(Integer, default=2026, nullable=False)
     status: Mapped[str] = mapped_column(String(30), default='active', nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+    )
     templates = relationship('FaceTemplate', back_populates='user', cascade='all, delete-orphan')
+
 
 class FaceTemplate(Base):
     __tablename__ = 'face_templates'
@@ -21,16 +29,21 @@ class FaceTemplate(Base):
     model_version: Mapped[str] = mapped_column(String(100), nullable=False)
     preprocessing_version: Mapped[str] = mapped_column(String(100), nullable=False)
     source_type: Mapped[str] = mapped_column(String(50), default='admin_reference_photo')
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     user = relationship('User', back_populates='templates')
-    __table_args__ = (Index('ix_face_template_version', 'model_version', 'preprocessing_version'),)
+    __table_args__ = (
+        Index('ix_face_template_version', 'model_version', 'preprocessing_version'),
+        Index('ix_face_templates_active_ver', 'model_version', 'preprocessing_version', 'is_active'),
+    )
+
 
 class VerificationEvent(Base):
     __tablename__ = 'verification_events'
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     user_id: Mapped[int | None] = mapped_column(ForeignKey('users.id', ondelete='SET NULL'), nullable=True, index=True)
     nim_masked: Mapped[str | None] = mapped_column(String(40), nullable=True)
-    mode: Mapped[str] = mapped_column(String(10), default='1:1')
+    mode: Mapped[str] = mapped_column(String(30), default='1:1')
     face_detected: Mapped[bool] = mapped_column(Boolean, default=False)
     face_count: Mapped[int] = mapped_column(Integer, default=0)
     detection_confidence: Mapped[float | None] = mapped_column(Float, nullable=True)
@@ -48,8 +61,31 @@ class VerificationEvent(Base):
     comparison_latency_ms: Mapped[float | None] = mapped_column(Float, nullable=True)
     antispoof_latency_ms: Mapped[float | None] = mapped_column(Float, nullable=True)
     total_latency_ms: Mapped[float | None] = mapped_column(Float, nullable=True)
+    matched_user_id: Mapped[int | None] = mapped_column(ForeignKey('users.id', ondelete='SET NULL'), nullable=True)
+    matched_nim_masked: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    search_backend: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    candidate_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
     model_version: Mapped[str | None] = mapped_column(String(100), nullable=True)
     preprocessing_version: Mapped[str | None] = mapped_column(String(100), nullable=True)
     threshold_version: Mapped[str | None] = mapped_column(String(100), nullable=True)
     request_id: Mapped[str | None] = mapped_column(String(80), nullable=True, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), index=True)
+
+
+class DuplicateIdentityAlert(Base):
+    __tablename__ = 'duplicate_identity_alerts'
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    event_id: Mapped[int | None] = mapped_column(ForeignKey('verification_events.id', ondelete='SET NULL'), nullable=True)
+    claimed_nim: Mapped[str] = mapped_column(String(80), nullable=False)
+    claimed_nim_masked: Mapped[str] = mapped_column(String(40), nullable=False)
+    claimed_name: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    matched_user_id: Mapped[int | None] = mapped_column(ForeignKey('users.id', ondelete='SET NULL'), nullable=True)
+    matched_nim_masked: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    similarity_score: Mapped[float | None] = mapped_column(Float, nullable=True)
+    threshold_used: Mapped[float | None] = mapped_column(Float, nullable=True)
+    alert_type: Mapped[str] = mapped_column(String(50), nullable=False)
+    review_status: Mapped[str] = mapped_column(String(30), default='pending', nullable=False, index=True)
+    reviewer_notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    model_version: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), index=True)
+    reviewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

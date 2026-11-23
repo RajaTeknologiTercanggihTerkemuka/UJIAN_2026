@@ -1,0 +1,11 @@
+{
+  "dataset_root": "/content/drive/MyDrive/IMSFD",
+  "valid_images": 23968,
+  "corrupt_images": 0,
+  "unique_identities": 68,
+  "expected_identities": 68,
+  "training_images": 18791,
+  "testing_images": 5177,
+  "identity_folders_without_valid_images": 0,
+  "identities_present_in_multiple_subsets": []
+}

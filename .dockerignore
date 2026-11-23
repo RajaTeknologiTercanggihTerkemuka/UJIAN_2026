@@ -1,0 +1,52 @@
+# Exclude heavy datasets, virtualenvs, training checkpoints, and secrets from Docker build context
+.git/
+.github/
+.dvc/
+.venv/
+.venv-face-api/
+.venv-mlops/
+**/__pycache__/
+**/*.py[cod]
+.pytest_cache/
+.env
+.env.*
+!.env.vps.example
+*.zip
+*.log
+*.db
+*.sqlite
+
+# Exclude ALL raw/processed/metadata datasets except tiny .dvc pointer files
+Dataset/raw/*/
+Dataset/processed/
+Dataset/metadata/
+Dataset/legacy/
+!Dataset/raw/*.dvc
+
+# Exclude heavy model weights (mounted via docker-compose volumes at runtime)
+**/*.pth
+**/*.pt
+**/*.ckpt
+**/*.onnx
+
+# Exclude heavy training artifacts & checkpoints, keep only tiny JSON/CSV metrics for Admin MLOps panel
+Face Recognition/artifacts/runs/
+Face Recognition/artifacts/thresholds/*.csv
+Face Recognition/notebooks/
+Face Recognition/tests/
+Face Recognition/third_party/Silent-Face-Anti-Spoofing/datasets/
+Face Recognition/third_party/Silent-Face-Anti-Spoofing/images/
+Face Recognition/third_party/Silent-Face-Anti-Spoofing/resources/
+MLOps/mlflow/server-data/
+MLOps/mlflow/artifacts/
+MLOps/imports/IMSFD_ArcFace_Output_v2/
+MLOps/imports/imsfd_partial_ft_v1/03_checkpoints/
+MLOps/imports/imsfd_partial_ft_v1/04_plots/
+MLOps/imports/imsfd_partial_ft_v1/02_splits/
+MLOps/imports/imsfd_partial_ft_v1/01_audit/*.csv
+MLOps/imports/imsfd_partial_ft_v1/01_audit/*.png
+MLOps/imports/imsfd_partial_ft_v1/validation_threshold_search.csv
+MLOps/private_*.csv
+Website/Back-end/tests/
+Website/Back-end/scripts/demo_identities_manifest.json
+deploy/demo_seed.sql

@@ -140,7 +140,9 @@ class SilentFaceMiniFASNetProvider:
             left, top, right, bottom = self._expanded_bbox(w, h, bbox_xywh, item["scale"])
             patch = frame_bgr[top:bottom + 1, left:right + 1]
             patch = cv2.resize(patch, (item["width"], item["height"]), interpolation=cv2.INTER_LINEAR)
-            tensor = torch.from_numpy(patch).permute(2, 0, 1).contiguous().float().div_(255.0).unsqueeze(0).to(self.device)
+            # Upstream Silent-Face src/data_io/functional.py explicitly keeps BGR pixel values
+            # in [0, 255] float (commented out .div(255)). Do NOT divide by 255.0.
+            tensor = torch.from_numpy(patch).permute(2, 0, 1).contiguous().float().unsqueeze(0).to(self.device)
             logits = item["model"](tensor)
             probs = F.softmax(logits, dim=1)[0]
             if probs.numel() != 3:

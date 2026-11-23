@@ -1,0 +1,16 @@
+{
+  "threshold_selected_on_validation": 0.3229581117630005,
+  "validation_EER_estimate": 0.008624602814344077,
+  "number_of_test_pairs": 26460,
+  "test_accuracy": 0.9924792139077854,
+  "test_precision": 0.9929636074752213,
+  "test_recall": 0.9919879062736205,
+  "test_f1_score": 0.9924755170718796,
+  "test_FAR": 0.007029478458049887,
+  "test_FRR": 0.00801209372637944,
+  "test_ROC_AUC": 0.997667638483965,
+  "TN": 13137,
+  "FP": 93,
+  "FN": 106,
+  "TP": 13124
+}

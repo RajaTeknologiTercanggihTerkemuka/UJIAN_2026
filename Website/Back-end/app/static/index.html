@@ -1,28 +1,260 @@
 <!doctype html>
 <html lang="id">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TA v2 — Registrasi & Verifikasi Wajah</title>
-<style>
-body{font-family:system-ui,Arial;background:#f4f6fa;color:#172033;margin:0}.wrap{max-width:850px;margin:28px auto;padding:20px}.card{background:white;border-radius:16px;padding:22px;margin-bottom:16px;box-shadow:0 5px 20px #17203312}h1{margin-top:0}label{display:block;margin:10px 0 5px;font-weight:600}input,button,select{padding:11px;border:1px solid #cbd5e1;border-radius:9px;font:inherit}input{width:100%;box-sizing:border-box}button{cursor:pointer;background:#1d4ed8;color:white;border:0;margin:8px 6px 0 0}button.secondary{background:#475569}video{width:100%;max-height:440px;background:#0f172a;border-radius:12px}pre{white-space:pre-wrap;background:#f1f5f9;padding:14px;border-radius:10px}.note{color:#64748b;font-size:.9rem}.status{font-weight:700}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:650px){.row{grid-template-columns:1fr}}</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sistem Registrasi &amp; Verifikasi Wajah Anti-Joki Berbasis MLOps</title>
+  <link rel="stylesheet" href="/static/styles.css">
 </head>
-<body><div class="wrap">
-<div class="card"><h1>Registrasi & Verifikasi Wajah</h1><p class="note">Prototype penelitian lokal. Kamera hanya diakses setelah Anda memberi izin. Jangan gunakan untuk keputusan ujian nyata sebelum validasi, autentikasi, anti-spoofing, dan pengamanan sistem lengkap.</p>
-<div class="row"><div><label>NIM</label><input id="nim" autocomplete="off" placeholder="Masukkan NIM"></div><div><label>Mode</label><select id="mode"><option value="verify">Verifikasi 1:1</option><option value="enroll">Registrasi referensi (admin)</option></select></div></div>
-<div id="nameWrap" style="display:none"><label>Nama lengkap (untuk enrollment admin)</label><input id="fullName" placeholder="Nama peserta"></div>
-<label>Kamera</label><select id="cameraMode"><option value="user">Kamera depan</option><option value="environment">Kamera belakang</option></select>
-<video id="video" autoplay playsinline muted></video><canvas id="canvas" hidden></canvas>
-<button id="startBtn">Aktifkan kamera</button><button id="captureBtn" class="secondary" disabled>Ambil & Proses Wajah</button>
-<p class="note" id="cameraStatus">Kamera belum aktif.</p>
-</div>
-<div class="card"><h2>Hasil</h2><div id="result" class="status">Belum ada permintaan.</div><pre id="details">-</pre></div>
-<div class="card"><a href="/admin">Dashboard operator →</a></div>
-</div>
-<script>
-const video=document.getElementById('video'), canvas=document.getElementById('canvas');let stream=null;
-const mode=document.getElementById('mode');mode.addEventListener('change',()=>document.getElementById('nameWrap').style.display=mode.value==='enroll'?'block':'none');
-document.getElementById('startBtn').onclick=async()=>{try{if(stream)stream.getTracks().forEach(t=>t.stop());stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:document.getElementById('cameraMode').value,width:{ideal:1280},height:{ideal:720}},audio:false});video.srcObject=stream;document.getElementById('captureBtn').disabled=false;document.getElementById('cameraStatus').textContent='Kamera aktif.'}catch(e){document.getElementById('cameraStatus').textContent='Gagal mengakses kamera: '+e.message}};
-document.getElementById('captureBtn').onclick=async()=>{const nim=document.getElementById('nim').value.trim();if(!nim){alert('Masukkan NIM');return}canvas.width=video.videoWidth;canvas.height=video.videoHeight;canvas.getContext('2d').drawImage(video,0,0);const blob=await new Promise(r=>canvas.toBlob(r,'image/jpeg',0.92));const form=new FormData();form.append('nim',nim);form.append('image',blob,'capture.jpg');let url='/api/verification/verify';const headers={};if(mode.value==='enroll'){const name=document.getElementById('fullName').value.trim();if(!name){alert('Isi nama lengkap');return}form.append('full_name',name);url='/api/registration/enroll';const key=prompt('Masukkan ADMIN_API_KEY untuk enrollment referensi:');if(!key)return;headers['X-Admin-Key']=key}
- document.getElementById('result').textContent='Memproses...';try{const response=await fetch(url,{method:'POST',headers,body:form});const data=await response.json();document.getElementById('result').textContent=data.decision_status||data.status||('HTTP '+response.status);document.getElementById('details').textContent=data.message||data.detail||('Permintaan selesai: '+(data.status||response.status))}catch(e){document.getElementById('result').textContent='Error';document.getElementById('details').textContent=e.message}};
-window.addEventListener('beforeunload',()=>{if(stream)stream.getTracks().forEach(t=>t.stop())});
-</script></body></html>
+<body data-theme="register">
+  <div id="appShell" class="app-shell">
+    <!-- Top Header -->
+    <header class="top-header">
+      <div class="brand">
+        <h1>Sistem Face Recognition Ujian — Anti-Joki &amp; MLOps</h1>
+        <p>InceptionResNetV1 Partial Fine-Tuning (IMSFD) &bull; MTCNN &bull; Anti-Spoofing PAD &bull; Pencarian 1:N</p>
+      </div>
+      <div class="health-pill" id="healthPill">
+        <span class="health-dot" id="healthDot"></span>
+        <span id="healthText">Memeriksa model...</span>
+      </div>
+    </header>
+
+    <!-- 3-Tab Navigation: Registrasi | Verifikasi | Admin / Operator -->
+    <nav class="tab-bar" role="tablist">
+      <button class="tab-btn active" data-tab="register" role="tab">Registrasi</button>
+      <button class="tab-btn" data-tab="verify" role="tab">Verifikasi</button>
+      <button class="tab-btn" data-tab="admin" role="tab">Admin / Operator</button>
+    </nav>
+
+    <!-- ==================== TAB 1: REGISTRASI (HIJAU PUDAR) ==================== -->
+    <section id="panel-register" class="tab-panel active">
+      <div class="card card-accent">
+        <div class="card-header">
+          <div>
+            <h2>Registrasi Peserta Ujian</h2>
+            <p>Masukkan Nama dan NIM (8–9 digit angka), lalu lakukan pemindaian wajah untuk pendaftaran baru atau daftar ulang.</p>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="field">
+            <label for="regName">Nama</label>
+            <input id="regName" type="text" autocomplete="off" placeholder="Contoh: Fauzi">
+          </div>
+          <div class="field">
+            <label for="regNim">NIM (8–9 digit angka)</label>
+            <input id="regNim" type="text" inputmode="numeric" maxlength="9" autocomplete="off" placeholder="Contoh: 04221001">
+          </div>
+        </div>
+
+        <!-- Camera Area -->
+        <div id="regCameraWrap">
+          <div class="camera-stage">
+            <video id="regVideo" autoplay playsinline muted></video>
+            <div class="camera-overlay">
+              <div id="regOval" class="face-oval"></div>
+              <div id="regBanner" class="challenge-banner">Isi Nama &amp; NIM (8–9 digit), lalu klik "Aktifkan Kamera"</div>
+            </div>
+          </div>
+          <div class="controls-row">
+            <div class="btn-group">
+              <button type="button" id="regStartCam" class="btn btn-soft">Aktifkan Kamera</button>
+              <button type="button" id="regSubmitCam" class="btn btn-primary" disabled>Pindai Wajah &amp; Daftar</button>
+            </div>
+            <label class="checkbox-label">
+              <input id="regChallengeToggle" type="checkbox" checked>
+              Active Liveness (kedip / gerak 1 detik)
+            </label>
+          </div>
+        </div>
+
+        <div id="regResult" class="result-box">
+          <div id="regResultTitle" class="result-title"></div>
+          <div id="regResultMsg"></div>
+          <div id="regResultMeta" class="result-meta"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 2: VERIFIKASI (MERAH PUDAR) ==================== -->
+    <section id="panel-verify" class="tab-panel">
+      <div class="card card-accent">
+        <div class="card-header">
+          <div>
+            <h2>Verifikasi Wajah Peserta Ujian</h2>
+            <p>Masukkan Nama dan NIM terdaftar (8–9 digit angka), lalu lakukan pemindaian wajah langsung untuk verifikasi kehadiran ujian.</p>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="field">
+            <label for="verName">Nama</label>
+            <input id="verName" type="text" autocomplete="off" placeholder="Contoh: Fauzi">
+          </div>
+          <div class="field">
+            <label for="verNim">NIM (8–9 digit angka)</label>
+            <input id="verNim" type="text" inputmode="numeric" maxlength="9" autocomplete="off" placeholder="Contoh: 04221001">
+          </div>
+        </div>
+
+        <!-- Camera Area -->
+        <div id="verCameraWrap">
+          <div class="camera-stage">
+            <video id="verVideo" autoplay playsinline muted></video>
+            <div class="camera-overlay">
+              <div id="verOval" class="face-oval"></div>
+              <div id="verBanner" class="challenge-banner">Isi Nama &amp; NIM (8–9 digit), lalu klik "Aktifkan Kamera"</div>
+            </div>
+          </div>
+          <div class="controls-row">
+            <div class="btn-group">
+              <button type="button" id="verStartCam" class="btn btn-soft">Aktifkan Kamera</button>
+              <button type="button" id="verSubmitCam" class="btn btn-primary" disabled>Pindai &amp; Verifikasi Wajah</button>
+            </div>
+            <label class="checkbox-label">
+              <input id="verChallengeToggle" type="checkbox" checked>
+              Active Liveness (kedip / gerak 1 detik)
+            </label>
+          </div>
+        </div>
+
+        <div id="verResult" class="result-box">
+          <div id="verResultTitle" class="result-title"></div>
+          <div id="verResultMsg"></div>
+          <div id="verResultMeta" class="result-meta"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 3: ADMIN / OPERATOR (BIRU PUDAR) ==================== -->
+    <section id="panel-admin" class="tab-panel">
+      <!-- Login Gate -->
+      <div id="adminLoginView" class="card card-accent login-card">
+        <h2 style="margin-top:0;color:var(--accent-text)">Masuk Panel Admin &amp; MLOps</h2>
+        <p class="muted">Khusus operator berwenang untuk memantau metrik biometrik, peringatan anti-joki, MLflow, dan drift model.</p>
+        <div class="field" style="text-align:left;margin-top:16px">
+          <label for="adminKeyInput">Password Operator</label>
+          <input id="adminKeyInput" type="password" placeholder="Masukkan password admin">
+        </div>
+        <button type="button" id="adminLoginBtn" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:12px">Masuk Dashboard Full</button>
+        <p id="adminLoginErr" class="muted" style="color:#a33232;margin-top:10px"></p>
+      </div>
+
+      <!-- Full-Width Admin Dashboard -->
+      <div id="adminDashView" style="display:none">
+        <div class="admin-toolbar">
+          <div>
+            <h2 style="margin:0;color:var(--accent-text)">Dashboard Operator &amp; Monitoring MLOps</h2>
+            <span id="adminLastUpdated" class="muted">Memuat data...</span>
+          </div>
+          <div class="btn-group">
+            <button type="button" id="btnRefreshAdmin" class="btn btn-primary btn-sm">Refresh Data</button>
+            <button type="button" id="btnResetEvents" class="btn btn-danger-soft btn-sm">Reset Riwayat</button>
+            <button type="button" id="btnReloadIndex" class="btn btn-soft btn-sm">Reload Vector Index</button>
+            <a id="mlflowLink" href="http://127.0.0.1:5000" target="_blank" rel="noopener" class="btn btn-outline btn-sm">Buka MLflow UI</a>
+            <a href="/metrics" target="_blank" rel="noopener" class="btn btn-outline btn-sm">Prometheus /metrics</a>
+            <button type="button" id="btnAdminLogout" class="btn btn-danger-soft btn-sm">Keluar</button>
+          </div>
+        </div>
+
+        <!-- Row 1: Operational KPIs -->
+        <div id="kpiGrid" class="kpi-grid"></div>
+
+        <!-- Row 2: Drift Monitor + MLflow / Model / DVC Overview -->
+        <div class="two-col">
+          <!-- Left: Passive Drift Monitor -->
+          <div class="card card-accent" style="margin-bottom:0">
+            <div class="card-header">
+              <div>
+                <h2>Drift Monitor &amp; Kesehatan Model</h2>
+                <p>Pemantauan otomatis performa real-time dari telemetri verifikasi &amp; registrasi.</p>
+              </div>
+              <span id="driftBadge" class="badge badge-blue">Memuat...</span>
+            </div>
+            <div id="driftStatusBar" class="drift-status-bar HEALTHY">
+              <strong id="driftHeadline">Memeriksa kesehatan model...</strong>
+              <span id="driftWindow" style="font-size:0.8rem"></span>
+            </div>
+            <div id="driftKvGrid" class="kv-grid"></div>
+            <ul id="driftReasons" style="margin:12px 0 0;padding-left:18px;font-size:0.84rem;color:var(--text)"></ul>
+          </div>
+
+          <!-- Right: MLflow, Model V1 Metrics, PAD Calibration & DVC -->
+          <div class="card card-accent" style="margin-bottom:0">
+            <div class="card-header">
+              <div>
+                <h2>Integrasi MLflow, Evaluasi Model V1 &amp; DVC</h2>
+                <p>Lineage model terlatih, ambang batas terkalibrasi, dan snapshot dataset.</p>
+              </div>
+              <span id="mlflowStatusBadge" class="badge badge-gray">MLflow: ...</span>
+            </div>
+            <div id="mlopsSummaryGrid" class="kv-grid"></div>
+            <div style="margin-top:12px">
+              <div class="muted" style="font-weight:600;font-size:0.78rem">Kurva Val ArcFace Top-1 (Epoch 1–15, IMSFD Partial Fine-Tuning)</div>
+              <div id="epochChart" class="epoch-chart"></div>
+            </div>
+            <div id="dvcBox" class="policy-note"></div>
+          </div>
+        </div>
+
+        <!-- Row 3: Anti-Joki & Spoofing Alerts -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2>Peringatan Anti-Joki &amp; Presentation Attack (Alerts)</h2>
+              <p>Otomatis terisi saat sistem mendeteksi duplikasi wajah 1:N lintas NIM (Joki Tipe B), takeover NIM, atau spoofing.</p>
+            </div>
+            <div class="inline-form">
+              <select id="alertFilter" style="padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-size:0.84rem">
+                <option value="">Semua Status</option>
+                <option value="pending">Pending Review</option>
+                <option value="confirmed_joki">Confirmed Joki</option>
+                <option value="false_positive">False Positive</option>
+                <option value="resolved">Resolved</option>
+              </select>
+            </div>
+          </div>
+          <div id="alertsTableWrap" class="table-wrap"></div>
+        </div>
+
+        <!-- Row 4: Registered Participants Data -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2>Data Peserta Terdaftar</h2>
+              <p>Daftar data peserta yang telah terdaftar pada sistem beserta status template wajah aktifnya.</p>
+            </div>
+            <div class="inline-form">
+              <input id="deleteNimInput" type="text" placeholder="Ketik NIM untuk dihapus">
+              <button type="button" id="btnDeleteNim" class="btn btn-danger-soft btn-sm">Hapus NIM</button>
+            </div>
+          </div>
+          <div id="demoUsersWrap" class="table-wrap"></div>
+        </div>
+
+        <!-- Row 5: Full Verification & Registration Events Log -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2>Riwayat Teknis Registrasi &amp; Verifikasi</h2>
+              <p>Detail lengkap skor kemiripan, threshold, skor PAD, kecepatan pencarian vektor, dan latency per tahap (NIM dimasking).</p>
+            </div>
+            <div class="inline-form">
+              <select id="eventModeFilter" style="padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-size:0.84rem">
+                <option value="">Semua Mode</option>
+                <option value="1:N_register">Registrasi (1:N Anti-Joki)</option>
+                <option value="1:1">Verifikasi (1:1)</option>
+              </select>
+            </div>
+          </div>
+          <div id="eventsTableWrap" class="table-wrap"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <canvas id="workCanvas" hidden></canvas>
+  <script src="/static/app.js"></script>
+</body>
+</html>
