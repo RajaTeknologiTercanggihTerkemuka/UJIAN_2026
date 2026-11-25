@@ -633,6 +633,7 @@ body {
   border: 1px solid var(--border);
   border-radius: 9px;
   padding: 8px 11px;
+  min-width: 0;
 }
 
 .kv-item span {
@@ -642,8 +643,12 @@ body {
 }
 
 .kv-item b {
-  font-size: 0.9rem;
+  display: block;
+  margin-top: 2px;
+  font-size: 0.87rem;
+  line-height: 1.35;
   color: var(--text);
+  overflow-wrap: anywhere;
 }
 
 .policy-note {

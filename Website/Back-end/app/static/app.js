@@ -527,12 +527,17 @@
     const ptTest = pt.test_metrics_at_frozen_validation_threshold || {};
     const audit = mlops.audit_summary || {};
 
+    const modelDisplayName =
+      stats.model.model_version === 'imsfd_partial_ft_v1'
+        ? 'InceptionResNetV1_Partial_Fine-Tuning_IMSFD_(512-ArcFace)'
+        : `${stats.model.model_version || '—'} (512-ArcFace)`;
+
     document.getElementById('mlopsSummaryGrid').innerHTML = [
-      ['Model Aktif', `${stats.model.model_version || '—'} (512-d ArcFace)`],
+      ['Model Aktif', modelDisplayName],
       ['Test Accuracy / ROC-AUC (IMSFD)', `${fmtPct(tm.test_accuracy, 2)} / ${fmtPct(tm.test_ROC_AUC, 2)}`],
       ['Test FAR / FRR (26.460 pasang)', `${fmtPct(tm.test_FAR, 2)} / ${fmtPct(tm.test_FRR, 2)}`],
       ['Kalibrasi MTCNN (1:1 / 1:N)', `${fmtNum(ft.threshold, 4)} (EER ${fmtPct(ft.eer_estimate, 2)}) / ${fmtNum(stats.model.dedup_threshold, 2)}`],
-      ['Kalibrasi PAD MiniFASNetV2', `Th ${fmtNum(pt.threshold, 4)} • Test ROC-AUC ${fmtPct(ptTest.ROC_AUC, 2)}`],
+      ['Sistem PAD (Anti-Spoofing)', `MiniFASNetV2 • Th ${fmtNum(pt.threshold, 4)} • Test ROC-AUC ${fmtPct(ptTest.ROC_AUC, 2)}`],
       ['PAD BPCER / APCER (389 uji)', `BPCER ${fmtPct(ptTest.BPCER, 2)} • APCER ${fmtPct(ptTest.APCER, 2)}`],
     ]
       .map(([k, v]) => `<div class="kv-item"><span>${esc(k)}</span><b>${esc(v)}</b></div>`)
